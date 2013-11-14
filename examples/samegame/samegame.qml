@@ -16,7 +16,7 @@ Rectangle {
         Image {
             id: background
             anchors.fill: parent
-            source: "background.jpg"
+            source: "pics/background.jpg"
             fillMode: Image.PreserveAspectCrop
         }
 

@@ -11,11 +11,11 @@ Item {
         anchors.fill: parent
         source: {
             if (type == 0)
-                return "redStone.png"
+                return "pics/redStone.png"
             else if (type == 1)
-                return "blueStone.png"
+                return "pics/blueStone.png"
             else
-                return "greenStone.png"
+                return "pics/greenStone.png"
         }
     }
 }
