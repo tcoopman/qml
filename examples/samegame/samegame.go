@@ -5,6 +5,7 @@ import (
 	"github.com/niemeyer/qml"
 	"os"
     "math/rand"
+    "strconv"
 )
 
 const (
@@ -25,13 +26,14 @@ type Game struct {
 	fillFound  int
 	floorBoard []int
 	parent     qml.Object
+    dialog   qml.Object
 }
 
 func (g *Game) index(col, row int) int {
 	return col + (row * g.MaxColumn)
 }
 
-func (g *Game) StartNewGame(parent qml.Object) {
+func (g *Game) StartNewGame(parent qml.Object, dialog qml.Object) {
 	for _, b := range g.Board {
         if b != nil {
 		    b.Destroy()
@@ -39,6 +41,8 @@ func (g *Game) StartNewGame(parent qml.Object) {
 	}
 
 	g.parent = parent
+    g.dialog = dialog
+
 	w := parent.Int("width")
 	h := parent.Int("height")
 	blockSize := parent.Int("blockSize")
@@ -177,7 +181,7 @@ func (g *Game) victoryCheck() {
     }
 
     if deservesBonus || !(g.floodMoveCheck(0, g.MaxRow -1, -1)) {
-        fmt.Printf("Game over. Your score is %d\n", score)
+        g.dialog.Call("show", "Game over. Your score is " + strconv.Itoa(score))
     }
 
 }

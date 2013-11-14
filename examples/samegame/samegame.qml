@@ -37,6 +37,12 @@ Rectangle {
         }
     }
 
+    Dialog {
+        id: dialog
+        anchors.centerIn: parent
+        z: 100
+    }
+
     Rectangle {
         id: toolBar
         width: parent.width; height: 30
@@ -46,13 +52,14 @@ Rectangle {
         S.Button {
             anchors { left: parent.left; verticalCenter: parent.verticalCenter }
             text: "New Game"
-            onClicked: game.startNewGame(gameCanvas)
+            onClicked: game.startNewGame(gameCanvas, dialog)
         }
 
         Text {
             id: score
             anchors { right: parent.right; verticalCenter: parent.verticalCenter }
             text: "Score: Who knows?"
+            color: "#FFFFFF"
         }
     }
 }
