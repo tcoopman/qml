@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/niemeyer/qml"
+	"math/rand"
 	"os"
-    "math/rand"
-    "strconv"
+	"strconv"
 )
 
 const (
@@ -26,7 +26,7 @@ type Game struct {
 	fillFound  int
 	floorBoard []int
 	parent     qml.Object
-    dialog   qml.Object
+	dialog     qml.Object
 }
 
 func (g *Game) index(col, row int) int {
@@ -35,13 +35,13 @@ func (g *Game) index(col, row int) int {
 
 func (g *Game) StartNewGame(parent qml.Object, dialog qml.Object) {
 	for _, b := range g.Board {
-        if b != nil {
-		    b.Destroy()
-        }
+		if b != nil {
+			b.Destroy()
+		}
 	}
 
 	g.parent = parent
-    g.dialog = dialog
+	g.dialog = dialog
 
 	w := parent.Int("width")
 	h := parent.Int("height")
@@ -61,22 +61,17 @@ func (g *Game) StartNewGame(parent qml.Object, dialog qml.Object) {
 }
 
 func (g *Game) HandleClick(xPos, yPos int) {
-	fmt.Println(xPos)
-	fmt.Println(yPos)
 	col := xPos / g.Block.BlockSize
 	row := yPos / g.Block.BlockSize
-	fmt.Printf("Clicking on col: %d, row: %d\n", col, row)
 
 	if col >= g.MaxColumn || col < 0 || row >= g.MaxRow || row < 0 {
 		return
 	}
 	if g.Board[g.index(col, row)] == nil {
-		fmt.Println("it is nil")
 		return
 	}
-	 g.floodFill(col, row, -1)
+	g.floodFill(col, row, -1)
 	if g.fillFound <= 0 {
-		fmt.Println("fillFound <= 0")
 		return
 	}
 
@@ -124,80 +119,80 @@ func (g *Game) floodFill(col, row, typ int) {
 }
 
 func (g *Game) shuffleDown() {
-    // Fall down
-    for col := 0; col < g.MaxColumn; col++ {
-        fallDist := 0
-        for row := g.MaxRow -1; row >= 0; row-- {
-            if g.Board[g.index(col, row)] == nil {
-                fallDist += 1
-            } else {
-                if fallDist > 0 {
-                    obj := g.Board[g.index(col, row)]
-                    y := obj.Int("y")
-                    y += fallDist * g.Block.BlockSize
-                    obj.Set("y", y)
-                    g.Board[g.index(col, row+fallDist)] = obj
-                    g.Board[g.index(col, row)] = nil
-                }
-            }
-        }
-    }
+	// Fall down
+	for col := 0; col < g.MaxColumn; col++ {
+		fallDist := 0
+		for row := g.MaxRow - 1; row >= 0; row-- {
+			if g.Board[g.index(col, row)] == nil {
+				fallDist += 1
+			} else {
+				if fallDist > 0 {
+					obj := g.Board[g.index(col, row)]
+					y := obj.Int("y")
+					y += fallDist * g.Block.BlockSize
+					obj.Set("y", y)
+					g.Board[g.index(col, row+fallDist)] = obj
+					g.Board[g.index(col, row)] = nil
+				}
+			}
+		}
+	}
 
-    // Fall to the left
-    fallDist := 0
-    for col := 0; col < g.MaxColumn; col++ {
-        if g.Board[g.index(col, g.MaxRow - 1)] == nil {
-            fallDist += 1
-        } else {
-            if fallDist > 0 {
-                for row := 0; row < g.MaxRow; row++ {
-                    obj := g.Board[g.index(col, row)]
-                    if obj == nil {
-                        continue
-                    }
+	// Fall to the left
+	fallDist := 0
+	for col := 0; col < g.MaxColumn; col++ {
+		if g.Board[g.index(col, g.MaxRow-1)] == nil {
+			fallDist += 1
+		} else {
+			if fallDist > 0 {
+				for row := 0; row < g.MaxRow; row++ {
+					obj := g.Board[g.index(col, row)]
+					if obj == nil {
+						continue
+					}
 
-                    x := obj.Int("x")
-                    x -= fallDist * g.Block.BlockSize
-                    obj.Set("x", x)
-                    g.Board[g.index(col - fallDist, row)] = obj
-                    g.Board[g.index(col, row)] = nil
-                }
-            }
-        }
-    }
+					x := obj.Int("x")
+					x -= fallDist * g.Block.BlockSize
+					obj.Set("x", x)
+					g.Board[g.index(col-fallDist, row)] = obj
+					g.Board[g.index(col, row)] = nil
+				}
+			}
+		}
+	}
 }
 
 func (g *Game) victoryCheck() {
-    deservesBonus := true
-    for col := g.MaxColumn - 1; col >= 0; col-- {
-        if g.Board[g.index(col, g.MaxRow -1)] != nil {
-            deservesBonus = false
-        }
-    }
-    score := g.parent.Int("score")
-    if deservesBonus {
-        score += 500
-        g.parent.Set("score", score)
-    }
+	deservesBonus := true
+	for col := g.MaxColumn - 1; col >= 0; col-- {
+		if g.Board[g.index(col, g.MaxRow-1)] != nil {
+			deservesBonus = false
+		}
+	}
+	score := g.parent.Int("score")
+	if deservesBonus {
+		score += 500
+		g.parent.Set("score", score)
+	}
 
-    if deservesBonus || !(g.floodMoveCheck(0, g.MaxRow -1, -1)) {
-        g.dialog.Call("show", "Game over. Your score is " + strconv.Itoa(score))
-    }
+	if deservesBonus || !(g.floodMoveCheck(0, g.MaxRow-1, -1)) {
+		g.dialog.Call("show", "Game over. Your score is "+strconv.Itoa(score))
+	}
 
 }
 
 func (g *Game) floodMoveCheck(col, row, typ int) bool {
-    if (col >= g.MaxColumn || col < 0 || row >= g.MaxRow || row < 0) {
-        return false
-    }
-    if g.Board[g.index(col, row)] == nil {
-        return false
-    }
-    myType := g.Board[g.index(col, row)].Int("type")
-    if typ ==  myType {
-        return true
-    }
-    return g.floodMoveCheck(col + 1, row, myType) || g.floodMoveCheck(col, row - 1, myType)
+	if col >= g.MaxColumn || col < 0 || row >= g.MaxRow || row < 0 {
+		return false
+	}
+	if g.Board[g.index(col, row)] == nil {
+		return false
+	}
+	myType := g.Board[g.index(col, row)].Int("type")
+	if typ == myType {
+		return true
+	}
+	return g.floodMoveCheck(col+1, row, myType) || g.floodMoveCheck(col, row-1, myType)
 }
 
 type Block struct {
@@ -209,7 +204,7 @@ func (b *Block) createBlock(col, row int, parent qml.Object) qml.Object {
 	dynamicBlock := b.Component.Create(nil)
 	dynamicBlock.Set("parent", parent)
 
-    dynamicBlock.Set("type", r.Intn(3))
+	dynamicBlock.Set("type", r.Intn(3))
 	dynamicBlock.Set("x", col*b.BlockSize)
 	dynamicBlock.Set("y", row*b.BlockSize)
 	dynamicBlock.Set("width", b.BlockSize)
