@@ -164,7 +164,36 @@ func (g *Game) shuffleDown() {
 }
 
 func (g *Game) victoryCheck() {
-	//TODO
+    deservesBonus := true
+    for col := g.MaxColumn - 1; col >= 0; col-- {
+        if g.Board[g.index(col, g.MaxRow -1)] != nil {
+            deservesBonus = false
+        }
+    }
+    score := g.parent.Int("score")
+    if deservesBonus {
+        score += 500
+        g.parent.Set("score", score)
+    }
+
+    if deservesBonus || !(g.floodMoveCheck(0, g.MaxRow -1, -1)) {
+        fmt.Printf("Game over. Your score is %d\n", score)
+    }
+
+}
+
+func (g *Game) floodMoveCheck(col, row, typ int) bool {
+    if (col >= g.MaxColumn || col < 0 || row >= g.MaxRow || row < 0) {
+        return false
+    }
+    if g.Board[g.index(col, row)] == nil {
+        return false
+    }
+    myType := g.Board[g.index(col, row)].Int("type")
+    if typ ==  myType {
+        return true
+    }
+    return g.floodMoveCheck(col + 1, row, myType) || g.floodMoveCheck(col, row - 1, myType)
 }
 
 type Block struct {
