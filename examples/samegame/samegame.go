@@ -33,7 +33,9 @@ func (g *Game) index(col, row int) int {
 
 func (g *Game) StartNewGame(parent qml.Object) {
 	for _, b := range g.Board {
-		b.Destroy()
+        if b != nil {
+		    b.Destroy()
+        }
 	}
 
 	g.parent = parent
