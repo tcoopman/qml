@@ -68,7 +68,7 @@ func (g *Game) HandleClick(xPos, yPos int) {
 		fmt.Println("it is nil")
 		return
 	}
-	g.floodFill(col, row, -1)
+	 g.floodFill(col, row, -1)
 	if g.fillFound <= 0 {
 		fmt.Println("fillFound <= 0")
 		return
@@ -80,12 +80,15 @@ func (g *Game) HandleClick(xPos, yPos int) {
 	g.parent.Set("score", score)
 
 	g.shuffleDown()
+	g.shuffleDown()
 	g.victoryCheck()
 }
 
 func (g *Game) floodFill(col, row, typ int) {
+	if col >= g.MaxColumn || col < 0 || row >= g.MaxRow || row < 0 {
+		return
+	}
 	if g.Board[g.index(col, row)] == nil {
-		fmt.Println("is it nil???")
 		return
 	}
 	first := false
@@ -97,9 +100,6 @@ func (g *Game) floodFill(col, row, typ int) {
 		g.floorBoard = make([]int, g.MaxIndex, g.MaxIndex)
 	}
 
-	if col >= g.MaxColumn || col < 0 || row >= g.MaxRow || row < 0 {
-		return
-	}
 	if g.floorBoard[g.index(col, row)] == 1 || (!first && typ != g.Board[g.index(col, row)].Int("type")) {
 		return
 	}
@@ -122,15 +122,13 @@ func (g *Game) shuffleDown() {
     for col := 0; col < g.MaxColumn; col++ {
         fallDist := 0
         for row := g.MaxRow -1; row >= 0; row-- {
-            if g.Board[g.index(row, col)] == nil {
+            if g.Board[g.index(col, row)] == nil {
                 fallDist += 1
             } else {
                 if fallDist > 0 {
                     obj := g.Board[g.index(col, row)]
                     y := obj.Int("y")
-                    fmt.Printf("y was: %d\n", y)
-                    y += fallDist + g.Block.BlockSize
-                    fmt.Printf("Setting y to: %d\n", y)
+                    y += fallDist * g.Block.BlockSize
                     obj.Set("y", y)
                     g.Board[g.index(col, row+fallDist)] = obj
                     g.Board[g.index(col, row)] = nil
