@@ -37,7 +37,7 @@ Rectangle {
         }
     }
 
-    Dialog {
+    S.Dialog {
         id: dialog
         anchors.centerIn: parent
         z: 100

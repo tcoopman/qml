@@ -9,6 +9,7 @@ import (
 )
 
 const (
+    NB_OF_TYPES = 4
 	MAX_COL   = 10
 	MAX_ROW   = 15
 	MAX_INDEX = MAX_COL * MAX_ROW
@@ -113,7 +114,7 @@ func (g *Game) floodFill(col, row, typ int) {
 	if first && g.fillFound == 0 {
 		return //Can't remove single blocks
 	}
-	g.Board[g.index(col, row)].Set("opacity", 0)
+	g.Board[g.index(col, row)].Set("dying", true)
 	g.Board[g.index(col, row)] = nil
 	g.fillFound += 1
 }
@@ -204,11 +205,12 @@ func (b *Block) createBlock(col, row int, parent qml.Object) qml.Object {
 	dynamicBlock := b.Component.Create(nil)
 	dynamicBlock.Set("parent", parent)
 
-	dynamicBlock.Set("type", r.Intn(3))
+	dynamicBlock.Set("type", r.Intn(NB_OF_TYPES))
 	dynamicBlock.Set("x", col*b.BlockSize)
 	dynamicBlock.Set("y", row*b.BlockSize)
 	dynamicBlock.Set("width", b.BlockSize)
 	dynamicBlock.Set("height", b.BlockSize)
+    dynamicBlock.Set("spawned", true)
 
 	return dynamicBlock
 }
