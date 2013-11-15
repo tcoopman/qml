@@ -222,6 +222,16 @@ func main() {
 	}
 }
 
+
+// Hack to exit the application when the window is not visible anymore.
+func destroy(visible bool) {
+    if !visible {
+        fmt.Println("not visible...")
+        os.Exit(1)
+    }
+
+}
+
 func run() error {
 	qml.Init(nil)
 	engine := qml.NewEngine()
@@ -241,6 +251,10 @@ func run() error {
 	context.SetVar("game", &game)
 
 	win := component.CreateWindow(nil)
+    fmt.Println(win.TypeName())
+    fmt.Println(win.Root().TypeName())
+    win.On("visibleChanged", destroy)
+    //win.Root().On("completed", func() { fmt.Println("completed!!") })
 
 	blockComponent, err := engine.LoadFile("Block.qml")
 	if err != nil {
