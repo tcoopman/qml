@@ -80,7 +80,7 @@ Item {
             when: dying == true
             StateChangeScript { script: particles.burst(50); }
             PropertyChanges { target: img; opacity: 0 }
-            StateChangeScript { script: block.destroy(1000); }
+            StateChangeScript { script: game.destroyBlock(block, 1000); }
         }
 
     ]

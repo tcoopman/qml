@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+    "time"
 )
 
 const (
@@ -196,6 +197,13 @@ func (g *Game) floodMoveCheck(col, row, typ int) bool {
 	return g.floodMoveCheck(col+1, row, myType) || g.floodMoveCheck(col, row-1, myType)
 }
 
+func (g *Game) DestroyBlock(block qml.Object, t int) {
+    go func() {
+        time.Sleep(time.Duration(t))
+        block.Destroy()
+    }()
+}
+
 type Block struct {
 	Component qml.Object
 	BlockSize int
@@ -212,6 +220,7 @@ func (b *Block) createBlock(col, row int, parent qml.Object) qml.Object {
 	dynamicBlock.Set("height", b.BlockSize)
     dynamicBlock.Set("spawned", true)
 
+
 	return dynamicBlock
 }
 
@@ -220,16 +229,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-
-// Hack to exit the application when the window is not visible anymore.
-func destroy(visible bool) {
-    if !visible {
-        fmt.Println("not visible...")
-        os.Exit(1)
-    }
-
+    os.Exit(0)
 }
 
 func run() error {
@@ -251,10 +251,6 @@ func run() error {
 	context.SetVar("game", &game)
 
 	win := component.CreateWindow(nil)
-    fmt.Println(win.TypeName())
-    fmt.Println(win.Root().TypeName())
-    win.On("visibleChanged", destroy)
-    //win.Root().On("completed", func() { fmt.Println("completed!!") })
 
 	blockComponent, err := engine.LoadFile("Block.qml")
 	if err != nil {
