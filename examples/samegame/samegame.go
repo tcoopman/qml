@@ -6,18 +6,17 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
-    "time"
+	"time"
 )
 
 const (
-    NB_OF_TYPES = 4
-	MAX_COL   = 10
-	MAX_ROW   = 15
-	MAX_INDEX = MAX_COL * MAX_ROW
+	NB_OF_TYPES = 4
+	MAX_COL     = 10
+	MAX_ROW     = 15
+	MAX_INDEX   = MAX_COL * MAX_ROW
 )
 
-//TODO unique seed
-var r = rand.New(rand.NewSource(0))
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 type Game struct {
 	MaxColumn  int
@@ -198,10 +197,10 @@ func (g *Game) floodMoveCheck(col, row, typ int) bool {
 }
 
 func (g *Game) DestroyBlock(block qml.Object, t int) {
-    go func() {
-        time.Sleep(time.Duration(t))
-        block.Destroy()
-    }()
+	go func() {
+		time.Sleep(time.Duration(t))
+		block.Destroy()
+	}()
 }
 
 type Block struct {
@@ -218,8 +217,7 @@ func (b *Block) createBlock(col, row int, parent qml.Object) qml.Object {
 	dynamicBlock.Set("y", row*b.BlockSize)
 	dynamicBlock.Set("width", b.BlockSize)
 	dynamicBlock.Set("height", b.BlockSize)
-    dynamicBlock.Set("spawned", true)
-
+	dynamicBlock.Set("spawned", true)
 
 	return dynamicBlock
 }
@@ -229,7 +227,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
-    os.Exit(0)
+	os.Exit(0)
 }
 
 func run() error {
